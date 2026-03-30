@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/cookie")
 public class CookieServlet extends HttpServlet {
@@ -28,7 +31,10 @@ public class CookieServlet extends HttpServlet {
 
         String cookieValue = req.getParameter("cookieValue");
 
-        Cookie cookie = new Cookie("userValue", cookieValue);
+        // 공백 문제 해결로 인한 추가
+        String encodedValue = URLEncoder.encode(cookieValue, StandardCharsets.UTF_8);
+
+        Cookie cookie = new Cookie("userValue", encodedValue); // 기존 userValue
         cookie.setMaxAge(60 * 60); // 1시간 만료 설정
         resp.addCookie(cookie);
 
@@ -45,7 +51,9 @@ public class CookieServlet extends HttpServlet {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if("userValue".equals(cookie.getName())) {
-                    saveValue = cookie.getValue();
+
+                    saveValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+//                    saveValue = cookie.getValue();
                     break;
                 }
             }
